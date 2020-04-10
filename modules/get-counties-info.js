@@ -61,7 +61,14 @@ module.exports = async (countiesPath, saveFile) => {
 		.catch(err => console.log(err));
 	const countiesArr = extractData(htmlPage);
 	console.log(`Found ${countiesArr.length} unique county items.`);
-	fs.writeFileSync(saveFile, JSON.stringify(countiesArr), 'utf8', () => console.log(`@CNAS::File ${saveFile} closed!`));
+	// write json to file
+	const returnObj = {
+		href: countiesPath,
+		counties: countiesArr,
+	};
+	// write json to file
+	fs.writeFileSync(saveFile, `${JSON.stringify(returnObj)}`, 'utf8', () => console.log(`@CNAS::File ${saveFile} closed!`));
 	console.log('@CNAS:: Counties Info file write Done');
-	return countiesArr;
+	// return the object
+	return returnObj;
 }

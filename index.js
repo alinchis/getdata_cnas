@@ -4,6 +4,7 @@ const glob = require('glob');
 // import local modules
 const createFolder = require('./modules/create-folder.js');
 const getCountiesInfo = require('./modules/get-counties-info.js');
+const getLocalitiesInfo = require('./modules/get-localities-info.js');
 // const getMetadata = require('./src/getMetadata.js');
 // const createIndexList = require('./src/createIndexList.js');
 // const createHeaders = require('./src/createHeaders.js');
@@ -119,9 +120,17 @@ async function main() {
     createFolder(2, tablesPath);
     createFolder(3, logsPath);
     // get counties info
-    const savePath = `${metadataPath}/counties.json`;
-    const countiesInfo = await getCountiesInfo(countiesInfoPath, savePath);
+    const countiesSavePath = `${metadataPath}/counties.json`;
+    const countiesInfo = await getCountiesInfo(countiesInfoPath, countiesSavePath);
+    // get localities info
+    const locSavePath = `${metadataPath}/localities.json`;
+    const filteredCounties = {
+      href: countiesInfo.href,
+      counties: countiesInfo.counties.filter( item => countiesList.length > 0 ? countiesList.includes(item.title) : true )
+    }
+    const localitiesInfo = await getLocalitiesInfo(filteredCounties, locSavePath);
     // start new download
+    
 
   // 3. else if argument is 'c'
   } else if (mainArg === '-c') {
