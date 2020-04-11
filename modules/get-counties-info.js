@@ -49,7 +49,6 @@ function extractData(htmlData) {
 module.exports = async (countiesPath, saveFile) => {
 	console.log('\x1b[34m%s\x1b[0m', `PROGRESS: Download Counties info`);
 
-	console.log('@CNAS:: Counties info import started ... ');
 	// declare variables
 	let htmlPage = '';
 	const countiesList = { counties: [] };

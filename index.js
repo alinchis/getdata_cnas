@@ -5,11 +5,7 @@ const glob = require('glob');
 const createFolder = require('./modules/create-folder.js');
 const getCountiesInfo = require('./modules/get-counties-info.js');
 const getLocalitiesInfo = require('./modules/get-localities-info.js');
-// const getMetadata = require('./src/getMetadata.js');
-// const createIndexList = require('./src/createIndexList.js');
-// const createHeaders = require('./src/createHeaders.js');
-// const createPermutations = require('./src/createPermutations.js');
-// const downloadTables = require('./src/downloadTables.js');
+const getLocalitiesData = require('./modules/get-localities-data.js');
 
 // local paths
 const dataPath = './data';
@@ -41,13 +37,22 @@ function getCurrentDate() {
 async function main() {
   // get current date
   const today = getCurrentDate();
+  // create folder paths variables
+  const metadataPath = `${dataPath}/${today}/${localPaths['metadata']}`;
+  const tablesPath = `${dataPath}/${today}/${localPaths['tables']}`;
+  const logsPath = `${dataPath}/${today}/${localPaths['logs']}`;
+  // create save files paths variables
+  const countiesSavePath = `${metadataPath}/counties.json`;
+  const locSavePath = `${metadataPath}/localities.json`;
+  const unitsSavePath = `${tablesPath}/units.csv`;
+  const servicesSavePath = `${tablesPath}/services.csv`;
 
   // help text
   const helpText = `\n Available commands:\n\n\
   1. -h : display help text\n\
-  2. -d : start new download\n\
-          !!! removes all files and folders in the current date: \'${today}\' folder\n\
-  3. -c : continue the most recent download\n`;
+  2. -m : download metadata for counties and localities\n\
+  3. -d : download data for each locality\n\
+  4. -c : continue the most recent download\n`;
 
   // get command line arguments
   const arguments = process.argv;
@@ -109,33 +114,43 @@ async function main() {
   if (mainArg === '-h') {
     console.log(helpText);
 
-  // 2. else if argument is 'd'
-  } else if (mainArg === '-d') {
-    // create paths names
-    const metadataPath = `${dataPath}/${today}/${localPaths['metadata']}`;
-    const tablesPath = `${dataPath}/${today}/${localPaths['tables']}`;
-    const logsPath = `${dataPath}/${today}/${localPaths['logs']}`;
+  // 2. else if argument is 'm'
+  } else if (mainArg === '-m') {
+
     // prepare folders // folders are not overriten
     createFolder(1, metadataPath);
     createFolder(2, tablesPath);
     createFolder(3, logsPath);
-    // get counties info
-    const countiesSavePath = `${metadataPath}/counties.json`;
+
+    // stage 1: get counties info
+    console.log('\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('STAGE 1: get counties info\n');
     const countiesInfo = await getCountiesInfo(countiesInfoPath, countiesSavePath);
-    // get localities info
-    const locSavePath = `${metadataPath}/localities.json`;
+
+    // stage 2: get localities info
+    console.log('\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('STAGE 2: get localities info\n');
     const filteredCounties = {
       href: countiesInfo.href,
       counties: countiesInfo.counties.filter( item => countiesList.length > 0 ? countiesList.includes(item.title) : true )
     }
-    const localitiesInfo = await getLocalitiesInfo(filteredCounties, locSavePath);
-    // start new download
-    
+    getLocalitiesInfo(filteredCounties, locSavePath);
 
-  // 3. else if argument is 'c'
+     // 3. else if argument is 'd'
+  } else if (mainArg === '-d') {
+
+    // stage 3: get localities DATA
+    console.log('\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('STAGE 3: get localities data\n');
+    // read localities metadata file
+    const localitiesInfo = require(`${metadataPath}/localities.json`);
+    // download data
+    getLocalitiesData(localitiesInfo, unitsSavePath, servicesSavePath);    
+
+  // 4. else if argument is 'c'
   } else if (mainArg === '-c') {
     // continue most recent download
-    continueDownload(today, countiesList);
+    // continueDownload(today, countiesList);
 
     // else print help
   } else {
