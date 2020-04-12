@@ -56,6 +56,8 @@ function extractData(dataArr, county, locality, htmlData) {
                 // if current row is not header row
                 if ($(row).find('td').length > 0) {
                     const rowArr = [];
+                    // add country column
+                    rowArr.push('Romania"');
                     // add county column
                     rowArr.push(county);
                     // add locality column
@@ -91,12 +93,12 @@ module.exports = async (loadObj, unitsSaveFile, servicesSaveFile) => {
     // create save units array
     const saveUArr = [];
     // add header
-    saveUArr.push(['judet', 'localitate', 'tip_unitate', 'denumire', 'nume_doctor', 'adresa', 'telefon', 'email', 'website']);
+    saveUArr.push(['tara', 'judet', 'localitate', 'tip_unitate', 'denumire', 'nume_doctor', 'adresa', 'telefon', 'email', 'website']);
 
     // create save services array
     const saveSArr = [];
     // add header
-    saveSArr.push(['judet', 'localitate', 'tip_serviciu', 'denumire', 'specialitate', 'adresa', 'telefon']);
+    saveSArr.push(['tara', 'judet', 'localitate', 'tip_serviciu', 'denumire', 'specialitate', 'adresa', 'telefon']);
 
     // load data
     const counties = loadObj.counties;
@@ -141,11 +143,11 @@ module.exports = async (loadObj, unitsSaveFile, servicesSaveFile) => {
     };
 
     // save units array to file
-	fs.writeFileSync(unitsSaveFile, replaceROChars(saveUArr.map(row => row.join(';')).join('\n')));
+	fs.writeFileSync(unitsSaveFile, replaceROChars(saveUArr.map((row, index) => index > 0 ? row.unshift(index).join('#') : row.unshift('id').join('#')).join('\n')));
     console.log('@CNAS:: UNITS file write Done!');
     
     // save services array to file
-	fs.writeFileSync(servicesSaveFile, replaceROChars(saveSArr.map(row => row.join(';')).join('\n')));
+	fs.writeFileSync(servicesSaveFile, replaceROChars(saveSArr.map((row, index) => index > 0 ? row.unshift(index).join('#') : row.unshift('id').join('#')).join('\n')));
 	console.log('@CNAS:: SERVICES file write Done!');
     
 }
