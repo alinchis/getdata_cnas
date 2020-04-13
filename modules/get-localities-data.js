@@ -57,7 +57,7 @@ function extractData(dataArr, county, locality, htmlData) {
                 if ($(row).find('td').length > 0) {
                     const rowArr = [];
                     // add country column
-                    rowArr.push('Romania"');
+                    rowArr.push('Romania');
                     // add county column
                     rowArr.push(county);
                     // add locality column
@@ -143,11 +143,21 @@ module.exports = async (loadObj, unitsSaveFile, servicesSaveFile) => {
     };
 
     // save units array to file
-	fs.writeFileSync(unitsSaveFile, replaceROChars(saveUArr.map((row, index) => index > 0 ? row.unshift(index).join('#') : row.unshift('id').join('#')).join('\n')));
+	fs.writeFileSync(unitsSaveFile, replaceROChars(saveUArr.map((row, index) => {
+        const firstColItem = index > 0 ? index : 'id';
+        // console.log(`#### ${row}`);
+        const newRow = [firstColItem, ...row];
+        // console.log(`$$$$$ ${newRow}`);
+        return newRow.join('#');
+    }).join('\n')));
     console.log('@CNAS:: UNITS file write Done!');
     
     // save services array to file
-	fs.writeFileSync(servicesSaveFile, replaceROChars(saveSArr.map((row, index) => index > 0 ? row.unshift(index).join('#') : row.unshift('id').join('#')).join('\n')));
-	console.log('@CNAS:: SERVICES file write Done!');
+    fs.writeFileSync(servicesSaveFile, replaceROChars(saveSArr.map((row, index) => {
+        const firstColItem = index > 0 ? index : 'id';
+        const newRow = [firstColItem, ...row];
+        return newRow.join('#');
+    }).join('\n')));
+    console.log('@CNAS:: SERVICES file write Done!');
     
 }
