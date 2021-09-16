@@ -16,7 +16,7 @@ const localPaths = {
 };
 
 // remote paths
-const countiesInfoPath = 'http://www.cas.cnas.ro/map-county'; // 
+const countiesInfoPath = 'http://cas.cnas.ro/map-county'; // 
 
 
 // ////////////////////////////////////////////////////////////////////////////
